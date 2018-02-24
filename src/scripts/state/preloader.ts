@@ -4,14 +4,29 @@ module Alak.State {
 
         preload() {
             this.loadingBar = new Entity.PreloadBar(this.game);
-            this.load.image('test', 'assets/images/test.png');
-            this.load.image('placeholder', 'assets/images/placeholder.png');
+
             this.load.image('paintpot', 'assets/images/paintpot.png');
             this.load.image('easel-wood', 'assets/images/easel-wood.png');
             this.load.image('easel-canvas', 'assets/images/easel-canvas.png');
-            this.load.image('dummy-subject', 'assets/images/dummy-subject.png');
+            //this.load.image('dummy-subject', 'assets/images/dummy-subject.png');
             this.load.image('brush-cursor', 'assets/images/cursor.png');
             this.load.image('brush-cursor-down', 'assets/images/cursor-down.png');
+
+            this.load.image('subject-face', 'assets/images/subject/face.png');
+
+            for (let i = 1; i <= Entity.Subject.FACE_PERMS; i++) {
+                Entity.Subject.FACE_PIECES.forEach(function (piece) {
+                    let path = 'assets/images/subject/' + piece + '_' + i + '.png';
+                    this.load.image('subject-' + piece + '-' + i, path);
+                }, this);
+            }
+
+            for (let i = 1; i <= Entity.Subject.BODY_PERMS; i++) {
+                Entity.Subject.BODY_PIECES.forEach(function (piece) {
+                    let path = 'assets/images/subject/' + piece + '_' + i + '.png';
+                    this.load.image('subject-' + piece + '-' + i, path);
+                }, this);
+            }
         }
 
         create() {

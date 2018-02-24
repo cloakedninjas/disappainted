@@ -4,18 +4,22 @@ module Alak.State {
 
         easelWood: Phaser.Image;
         easelCanvas: Phaser.Image;
-
         easelArea: Phaser.BitmapData;
         easelImage: Phaser.Image;
+
+        subjectScale: number = 0.75;
+        subjectLower: Phaser.Image;
         subjectComposite: Phaser.BitmapData;
         subjectCompositeImage: Phaser.Image;
         subjectChunkData: number[];
+
         easelWidth: number = 380;
         easelHeight: number = 490;
         easelX: number = 400;
         easelY: number = 40;
-        subjectX: number = 90;
-        subjectY: number = 90;
+        subjectX: number = 85;
+        subjectY: number = 76;
+        brushSize: number = 5;
         lookingAtSubject: boolean = true;
         paintPots: Entity.PaintPot[];
         currentColour: string;
@@ -24,8 +28,6 @@ module Alak.State {
         debugEnabled: boolean = false;
 
         create() {
-            //this.add.image(0, 0, 'placeholder');
-
             this.easelWood = new Phaser.Image(this.game, this.easelX + 45, this.easelY - 51, 'easel-wood');
             this.easelCanvas = new Phaser.Image(this.game, this.easelX - 9, this.easelY - 5, 'easel-canvas');
             this.add.existing(this.easelCanvas);
@@ -37,13 +39,7 @@ module Alak.State {
             // add wood after painting area
             this.add.existing(this.easelWood);
 
-            this.subjectComposite = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
-            this.subjectCompositeImage = this.subjectComposite.addToWorld(this.subjectX, this.subjectY);
-
-            // standin
-            this.subjectComposite.draw(new Phaser.Image(this.game, 0, 0, 'dummy-subject'));
-            this.subjectCompositeImage.scale.x = 0.75;
-            this.subjectCompositeImage.scale.y = 0.75;
+            this.createSubject();
 
             //let foo = this.add.image(this.easelX, this.easelY, 'dummy-subject');
             //foo.alpha = 0.5;
@@ -90,16 +86,15 @@ module Alak.State {
 
         update() {
             let game = this.game;
-            let lineWidth = 4;
 
             if (game.input.activePointer.isDown) {
                 let paintX = game.input.x - this.easelX;
                 let paintY = game.input.y - this.easelY;
 
-                this.tempDrawArea.circle(paintX, paintY, lineWidth / 2, this.currentColour);
+                this.tempDrawArea.circle(paintX, paintY, this.brushSize / 2, this.currentColour);
 
                 if (this.prevMousePos) {
-                    this.tempDrawArea.line(paintX, paintY, this.prevMousePos.x, this.prevMousePos.y, this.currentColour, lineWidth);
+                    this.tempDrawArea.line(paintX, paintY, this.prevMousePos.x, this.prevMousePos.y, this.currentColour, this.brushSize);
                 }
 
                 this.easelArea.copy(this.tempDrawArea);
@@ -133,22 +128,40 @@ module Alak.State {
         moveCanvas(towards: boolean) {
             let duration = 800;
             let easing = Phaser.Easing.Quintic.InOut;
+            let easelMoveAmount = 315;
+            let subjectMoveAmount = 80;
 
             if (towards) {
                 this.game.add.tween(this.easelImage.position).to({
-                    x: this.easelX
+                    x: this.easelImage.x - easelMoveAmount
+                }, duration, easing, true);
+
+                this.game.add.tween(this.easelCanvas.position).to({
+                    x: this.easelCanvas.x - easelMoveAmount
+                }, duration, easing, true);
+
+                this.game.add.tween(this.easelWood.position).to({
+                    x: this.easelWood.x - easelMoveAmount
                 }, duration, easing, true);
 
                 this.game.add.tween(this.subjectCompositeImage.position).to({
-                    x: this.subjectX
+                    x: this.subjectCompositeImage.x - subjectMoveAmount
                 }, duration, easing, true);
             } else {
                 this.game.add.tween(this.easelImage.position).to({
-                    x: 715
+                    x: this.easelImage.x + easelMoveAmount
+                }, duration, easing, true);
+
+                this.game.add.tween(this.easelCanvas.position).to({
+                    x: this.easelCanvas.x + easelMoveAmount
+                }, duration, easing, true);
+
+                this.game.add.tween(this.easelWood.position).to({
+                    x: this.easelWood.x + easelMoveAmount
                 }, duration, easing, true);
 
                 this.game.add.tween(this.subjectCompositeImage.position).to({
-                    x: 155
+                    x: this.subjectCompositeImage.x + subjectMoveAmount
                 }, duration, easing, true);
             }
         }
@@ -156,8 +169,11 @@ module Alak.State {
         calcScore() {
             let score = 0;
 
+            // updated BMDs
             this.easelArea.update();
             this.subjectComposite.update();
+
+            this.subjectChunkData = this.calcChunkData(this.subjectComposite);
 
             let userData = this.easelArea.imageData.data;
             let subjectData = this.subjectComposite.imageData.data;
@@ -203,6 +219,33 @@ module Alak.State {
             }
 
             return chunks;
+        }
+
+        createSubject() {
+            let bodyPerm = Math.floor(Phaser.Math.random(1, Entity.Subject.BODY_PERMS + 1));
+            this.subjectLower = this.add.image(this.subjectX - 27, this.easelHeight - 47, 'subject-pants-' + bodyPerm);
+            this.subjectLower.scale.x = this.subjectScale;
+            this.subjectLower.scale.y = this.subjectScale;
+
+            this.subjectComposite = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
+
+            // shirt
+            this.subjectComposite.draw(new Phaser.Image(this.game, 0, 0, 'subject-shirt-' + bodyPerm));
+
+            // build the face
+            this.subjectComposite.draw(new Phaser.Image(this.game, 0, 0, 'subject-face'));
+
+            Entity.Subject.FACE_PIECES.forEach(function (piece) {
+                let piecePerm = Math.floor(Phaser.Math.random(1, Entity.Subject.FACE_PERMS + 1));
+                let key = 'subject-' + piece + '-' + piecePerm;
+
+                this.subjectComposite.draw(new Phaser.Image(this.game, 0, 0, key));
+            }, this);
+
+
+            this.subjectCompositeImage = this.subjectComposite.addToWorld(this.subjectX, this.subjectY);
+            this.subjectCompositeImage.scale.x = 0.75;
+            this.subjectCompositeImage.scale.y = 0.75;
         }
     }
 }
