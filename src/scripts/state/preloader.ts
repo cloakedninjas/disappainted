@@ -10,7 +10,7 @@ module Alak.State {
             this.load.image('easel-canvas', 'assets/images/easel-canvas.png');
             this.load.image('brush-cursor', 'assets/images/cursor.png');
             this.load.image('brush-cursor-down', 'assets/images/cursor-down.png');
-
+            this.load.image('selected-paint', 'assets/images/selected_paint.png');
             this.load.image('subject-face', 'assets/images/subject/face.png');
 
             for (let i = 1; i <= Entity.Subject.FACE_PERMS; i++) {
