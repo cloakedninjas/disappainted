@@ -5,6 +5,11 @@ module Alak.State {
         preload() {
             this.loadingBar = new Entity.PreloadBar(this.game);
             this.load.image('test', 'assets/images/test.png');
+            this.load.image('placeholder', 'assets/images/placeholder.png');
+            this.load.image('paintpot', 'assets/images/paintpot.png');
+            this.load.image('dummy-subject', 'assets/images/dummy-subject.png');
+            this.load.image('brush-cursor', 'assets/images/cursor.png');
+            this.load.image('brush-cursor-down', 'assets/images/cursor-down.png');
         }
 
         create() {
