@@ -1,17 +1,25 @@
 module Alak.State {
     export class Game extends Phaser.State {
+        static COLOUR_PALLETE = [
+            '#8c5214', '#eaac78', '#ffd4ae', '#19a541',
+            '#9abd3b', '#fff', '#ffb0c5', '#e53c70'
+        ];
+
         tempDrawArea: Phaser.BitmapData;
 
         easelWood: Phaser.Image;
         easelCanvas: Phaser.Image;
-        easelArea: Phaser.BitmapData;
+
+        visibleBitmap: Phaser.BitmapData;
         easelImage: Phaser.Image;
+        finalBitmap: Phaser.BitmapData;
 
         subjectScale: number = 0.75;
         subjectLower: Phaser.Image;
         subjectComposite: Phaser.BitmapData;
         subjectCompositeImage: Phaser.Image;
-        subjectChunkData: number[];
+
+        judgingRect: Phaser.Rectangle;
 
         easelWidth: number = 380;
         easelHeight: number = 490;
@@ -20,8 +28,9 @@ module Alak.State {
         subjectX: number = 85;
         subjectY: number = 76;
         brushSize: number = 5;
+
         lookingAtSubject: boolean = true;
-        paintPots: Entity.PaintPot[];
+        palette: Entity.Palette;
         currentColour: string;
         prevMousePos: Phaser.Point;
         debug: Phaser.Text;
@@ -33,27 +42,26 @@ module Alak.State {
             this.add.existing(this.easelCanvas);
 
             this.tempDrawArea = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
-            this.easelArea = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
-            this.easelImage = this.easelArea.addToWorld(this.easelX, this.easelY);
+            this.visibleBitmap = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
+            this.easelImage = this.visibleBitmap.addToWorld(this.easelX, this.easelY);
+            this.visibleBitmap.fill(237, 232, 218, 1);
+
+            this.finalBitmap = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
 
             // add wood after painting area
             this.add.existing(this.easelWood);
 
             this.createSubject();
 
-            //let foo = this.add.image(this.easelX, this.easelY, 'dummy-subject');
-            //foo.alpha = 0.5;
+            this.palette = new Entity.Palette(this.game, -18, 541);
+            this.add.existing(this.palette);
 
-            this.paintPots = [];
-            this.paintPots.push(new Entity.PaintPot(this.game, 0, 500, 'red'));
-            this.paintPots.push(new Entity.PaintPot(this.game, 100, 500, 'blue'));
-
-            this.paintPots.forEach(function (paintpot: Entity.PaintPot) {
+            /*this.paintPots.forEach(function (paintpot: Entity.PaintPot) {
                 this.add.existing(paintpot);
                 paintpot.events.onInputDown.add(this.handleColourChange, this);
-            }, this);
+            }, this);*/
 
-            this.currentColour = this.paintPots[0].colour;
+            this.currentColour = 'blue';
 
             if (this.debugEnabled) {
                 this.debug = new Phaser.Text(this.game, 400, this.game.height - 20, 'Hello', {
@@ -82,6 +90,14 @@ module Alak.State {
             this.game.input.onUp.add(function () {
                 cursor.loadTexture('brush-cursor');
             }, this);
+
+            let timer = this.game.time.create();
+
+            timer.loop(100, function () {
+                this.visibleBitmap.fill(237, 232, 218, 0.2);
+            }, this);
+
+            timer.start();
         }
 
         update() {
@@ -97,35 +113,39 @@ module Alak.State {
                     this.tempDrawArea.line(paintX, paintY, this.prevMousePos.x, this.prevMousePos.y, this.currentColour, this.brushSize);
                 }
 
-                this.easelArea.copy(this.tempDrawArea);
+                this.visibleBitmap.copy(this.tempDrawArea);
+                this.finalBitmap.copy(this.tempDrawArea);
+                this.tempDrawArea.clear();
 
                 this.prevMousePos = new Phaser.Point(paintX, paintY);
             } else {
                 this.prevMousePos = null;
             }
 
-            if (this.debugEnabled) {
+            //this.visibleBitmap.fill(237, 232, 218, 0.05);
+
+            /*if (this.debugEnabled) {
                 let paintX = game.input.x - this.easelX;
                 let paintY = game.input.y - this.easelY;
 
                 if (paintX >= 0 && paintY >= 0 && paintX <= this.easelWidth && paintY <= this.easelHeight) {
                     let subjectCol = this.subjectComposite.getPixel(paintX, paintY);
-                    let easelCol = this.easelArea.getPixel(paintX, paintY);
+                    let easelCol = this.visibleBitmap.getPixel(paintX, paintY);
 
                     subjectCol = subjectCol.r + ',' + subjectCol.g + ',' + subjectCol.b;
                     easelCol = easelCol.r + ',' + easelCol.g + ',' + easelCol.b;
 
                     this.debug.text = paintX + ', ' + paintY + ' | Subject: ' + subjectCol + '| Easel: ' + easelCol;
                 }
-            }
+            }*/
         }
 
-        lookAtSubject() {
+        /*lookAtSubject() {
             this.lookingAtSubject = !this.lookingAtSubject;
             this.moveCanvas(this.lookingAtSubject);
-        }
+        }*/
 
-        moveCanvas(towards: boolean) {
+        /*moveCanvas(towards: boolean) {
             let duration = 800;
             let easing = Phaser.Easing.Quintic.InOut;
             let easelMoveAmount = 315;
@@ -164,42 +184,45 @@ module Alak.State {
                     x: this.subjectCompositeImage.x + subjectMoveAmount
                 }, duration, easing, true);
             }
-        }
+        }*/
 
         calcScore() {
             let score = 0;
+            let total = 0;
 
-            // updated BMDs
-            this.easelArea.update();
+            // update BMDs
+            this.visibleBitmap.update();
             this.subjectComposite.update();
 
-            this.subjectChunkData = this.calcChunkData(this.subjectComposite);
+            // define judging area
+            this.judgingRect = new Phaser.Rectangle(30, 10, 290, 480);
 
-            let userData = this.easelArea.imageData.data;
-            let subjectData = this.subjectComposite.imageData.data;
+            /*let userData = this.visibleBitmap.getPixels(this.judgingRect).data;
+            let subjectData = this.subjectComposite.getPixels(this.judgingRect);*/
 
-            for (let i = 0, len = userData.length; i < len; i += 4) {
-                if (
-                    userData[i] === subjectData[i] && // R
-                    userData[i + 1] === subjectData[i + 1] && // G
-                    userData[i + 2] === subjectData[i + 2] // B
-                ) {
+            // chop up image into 10x10 chunks
+            let subjectChunkData = this.calcChunkData(this.subjectComposite.getPixels(this.judgingRect));
+            let userChunkData = this.calcChunkData(this.visibleBitmap.getPixels(this.judgingRect));
+
+            for (let i = 0, len = userChunkData.length; i < len; i++) {
+                total++;
+                if (subjectChunkData[i] !== 0 && userChunkData[i] === subjectChunkData[i]) {
                     score++;
                 }
             }
 
-            console.log(score);
+            console.log(score, (score / total) * 100);
         }
 
-        handleColourChange(paintPot: Entity.PaintPot) {
-            this.currentColour = paintPot.colour;
+        handleColourChange() {
+            //this.currentColour = paintPot.colour;
         }
 
-        calcChunkData(sourceBitmap: Phaser.BitmapData):number[] {
+        calcChunkData(sourceData: ImageData): number[] {
             let chunkSize = 10;
             let chunks = [];
             let k = 0;
-            let data = sourceBitmap.imageData.data;
+            let data = sourceData.data;
             let chunkWidth = this.easelWidth / chunkSize;
             let chunkHeight = this.easelHeight / chunkSize;
             let pxChunkSize = chunkSize * 4;
