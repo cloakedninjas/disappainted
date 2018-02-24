@@ -4,11 +4,7 @@ module Alak {
     export class Game extends Phaser.Game {
 
         constructor() {
-            super({
-                width: window.innerWidth,
-                height: window.innerHeight,
-                renderer: Phaser.AUTO
-            });
+            super(800, 600);
 
             this.state.add('preloader', State.Preloader, true);
             this.state.add('game', State.Game);
