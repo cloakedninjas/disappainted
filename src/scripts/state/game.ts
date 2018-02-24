@@ -1,6 +1,10 @@
 module Alak.State {
     export class Game extends Phaser.State {
         tempDrawArea: Phaser.BitmapData;
+
+        easelWood: Phaser.Image;
+        easelCanvas: Phaser.Image;
+
         easelArea: Phaser.BitmapData;
         easelImage: Phaser.Image;
         subjectComposite: Phaser.BitmapData;
@@ -20,11 +24,18 @@ module Alak.State {
         debugEnabled: boolean = false;
 
         create() {
-            this.add.image(0, 0, 'placeholder');
+            //this.add.image(0, 0, 'placeholder');
+
+            this.easelWood = new Phaser.Image(this.game, this.easelX + 45, this.easelY - 51, 'easel-wood');
+            this.easelCanvas = new Phaser.Image(this.game, this.easelX - 9, this.easelY - 5, 'easel-canvas');
+            this.add.existing(this.easelCanvas);
 
             this.tempDrawArea = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
             this.easelArea = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
             this.easelImage = this.easelArea.addToWorld(this.easelX, this.easelY);
+
+            // add wood after painting area
+            this.add.existing(this.easelWood);
 
             this.subjectComposite = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
             this.subjectCompositeImage = this.subjectComposite.addToWorld(this.subjectX, this.subjectY);
@@ -34,8 +45,8 @@ module Alak.State {
             this.subjectCompositeImage.scale.x = 0.75;
             this.subjectCompositeImage.scale.y = 0.75;
 
-            let foo = this.add.image(this.easelX, this.easelY, 'dummy-subject');
-            foo.alpha = 0.5;
+            //let foo = this.add.image(this.easelX, this.easelY, 'dummy-subject');
+            //foo.alpha = 0.5;
 
             this.paintPots = [];
             this.paintPots.push(new Entity.PaintPot(this.game, 0, 500, 'red'));
@@ -48,11 +59,13 @@ module Alak.State {
 
             this.currentColour = this.paintPots[0].colour;
 
-            this.debug = new Phaser.Text(this.game, 400, this.game.height - 20, 'Hello', {
-                font: '12px Arial'
-            });
+            if (this.debugEnabled) {
+                this.debug = new Phaser.Text(this.game, 400, this.game.height - 20, 'Hello', {
+                    font: '12px Arial'
+                });
 
-            this.add.existing(this.debug);
+                this.add.existing(this.debug);
+            }
 
             window['foo'] = this;
 
@@ -62,8 +75,8 @@ module Alak.State {
             cursor.anchor.set(0.13, 1);
 
             this.game.input.addMoveCallback(function () {
-                cursor.x = this.game.input.mousePointer.x;
-                cursor.y = this.game.input.mousePointer.y;
+                cursor.x = Math.round(this.game.input.mousePointer.x);
+                cursor.y = Math.round(this.game.input.mousePointer.y);
             }, this);
 
             this.game.input.onDown.add(function () {
