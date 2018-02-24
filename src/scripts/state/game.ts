@@ -20,6 +20,7 @@ module Alak.State {
         subjectCompositeImage: Phaser.Image;
 
         judgingRect: Phaser.Rectangle;
+        inkFade: boolean = true;
 
         easelWidth: number = 380;
         easelHeight: number = 490;
@@ -37,6 +38,7 @@ module Alak.State {
         debugEnabled: boolean = false;
 
         create() {
+            this.add.image(0, 0, 'background');
             this.easelWood = new Phaser.Image(this.game, this.easelX + 45, this.easelY - 51, 'easel-wood');
             this.easelCanvas = new Phaser.Image(this.game, this.easelX - 9, this.easelY - 5, 'easel-canvas');
             this.add.existing(this.easelCanvas);
@@ -193,6 +195,9 @@ module Alak.State {
             // update BMDs
             this.visibleBitmap.update();
             this.subjectComposite.update();
+
+            this.easelImage.visible = false;
+            this.finalBitmap.addToWorld(this.easelX, this.easelY);
 
             // define judging area
             this.judgingRect = new Phaser.Rectangle(30, 10, 290, 480);

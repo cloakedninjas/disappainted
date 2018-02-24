@@ -5,6 +5,7 @@ module Alak.State {
         preload() {
             this.loadingBar = new Entity.PreloadBar(this.game);
 
+            this.load.image('background', 'assets/images/background.png');
             this.load.image('palette', 'assets/images/palette.png');
             this.load.image('easel-wood', 'assets/images/easel-wood.png');
             this.load.image('easel-canvas', 'assets/images/easel-canvas.png');
