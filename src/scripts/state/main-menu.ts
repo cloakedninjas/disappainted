@@ -40,7 +40,7 @@ module Alak.State {
                 let clickArea:PIXI.Rectangle = this.clickAreas[person];
 
                 if (clickArea.contains(this.game.input.activePointer.x, this.game.input.activePointer.y)) {
-                    document.location.href = this.links[person];
+                    window.open(this.links[person]);
                     break;
                 }
             }
