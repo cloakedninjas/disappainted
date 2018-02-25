@@ -11,7 +11,6 @@ module Alak.State {
             }, this, 1, 0, 2);
 
             this.add.existing(this.button);
-
         }
     }
 }

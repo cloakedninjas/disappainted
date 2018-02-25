@@ -30,6 +30,11 @@ module Alak.State {
         debug: Phaser.Text;
         debugEnabled: boolean = false;
 
+        sounds: {
+            paintStart: Phaser.Sound
+            //paintContinuous: Phaser.Sound
+        };
+
         create() {
             this.add.image(0, 0, 'background');
             this.easelWood = new Phaser.Image(this.game, this.easelX + 45, this.easelY - 51, 'easel-wood');
@@ -39,6 +44,7 @@ module Alak.State {
             this.tempDrawArea = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
             this.visibleBitmap = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
             this.easelImage = this.visibleBitmap.addToWorld(this.easelX, this.easelY);
+            this.easelImage.inputEnabled = true;
             this.visibleBitmap.fill(237, 232, 218, 1);
 
             this.finalBitmap = new Phaser.BitmapData(this.game, null, this.easelWidth, this.easelHeight);
@@ -51,12 +57,6 @@ module Alak.State {
             this.palette = new Entity.Palette(this.game, -18, 541);
             this.add.existing(this.palette);
 
-            /*this.paintPots.forEach(function (paintpot: Entity.PaintPot) {
-             this.add.existing(paintpot);
-             paintpot.events.onInputDown.add(this.handleColourChange, this);
-             }, this);*/
-
-
             if (this.debugEnabled) {
                 this.debug = new Phaser.Text(this.game, 10, 10, 'Hello', {
                     font: '12px Arial'
@@ -65,7 +65,8 @@ module Alak.State {
                 this.add.existing(this.debug);
             }
 
-            window['foo'] = this;
+            let startSound = this.add.sound('play');
+            startSound.play();
 
             this.game.canvas.classList.add('hide-cursor');
 
@@ -75,15 +76,35 @@ module Alak.State {
             this.game.input.addMoveCallback(function () {
                 this.paintBrush.x = Math.round(this.game.input.mousePointer.x);
                 this.paintBrush.y = Math.round(this.game.input.mousePointer.y);
+
+                /*if (this.game.input.activePointer.isDown && !this.sounds.paintContinuous.isPlaying) {
+                    this.sounds.paintContinuous.play();
+                }
+
+                if (!this.game.input.activePointer.isDown && this.sounds.paintContinuous.isPlaying) {
+                    this.sounds.paintContinuous.stop();
+                }*/
             }, this);
 
-            this.game.input.onDown.add(function () {
+            /*this.game.input.onDown.add(function () {
                 this.paintBrush.loadTexture('brush-cursor-down');
+                this.sounds.paintStart.play();
+            }, this);*/
+
+            this.easelImage.events.onInputDown.add(function () {
+                this.paintBrush.loadTexture('brush-cursor-down');
+                this.sounds.paintStart.play();
             }, this);
 
             this.game.input.onUp.add(function () {
                 this.paintBrush.loadTexture('brush-cursor');
+                //this.sounds.paintContinuous.stop();
             }, this);
+
+            this.sounds = {
+                paintStart: new Phaser.Sound(this.game, 'paint-start'),
+                //paintContinuous: new Phaser.Sound(this.game, 'paint-continuous', 1, true)
+            };
 
             let timer = this.game.time.create();
 

@@ -40,6 +40,7 @@ module Alak.State {
 
             this.continueButton = new Phaser.Button(this.game, 575, 540, 'btn-continue', this.hideSubject, this);
             this.continueButton.visible = false;
+            this.continueButton.onDownSound = new Phaser.Sound(this.game, 'btn-click');
             this.add.existing(this.continueButton);
 
             this.game.add.tween(this.group1).to({
@@ -147,6 +148,8 @@ module Alak.State {
             this.playAgainButton = new Phaser.Button(this.game, 465, 370, 'btn-play-again', function () {
                 this.game.state.start('game');
             }, this);
+
+            this.playAgainButton.onDownSound = new Phaser.Sound(this.game, 'btn-click');
 
             this.add.existing(this.playAgainButton);
         }
