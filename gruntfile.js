@@ -28,6 +28,10 @@ module.exports = function (grunt) {
                         src: 'src/index.html',
                         dest: 'public/index.html'
                     },
+                  {
+                    src: 'src/credits.html',
+                    dest: 'public/credits.html'
+                  },
                     {
                         src: 'node_modules/phaser/build/custom/phaser-no-physics.js',
                         dest: 'public/vendor/phaser/phaser.js'
