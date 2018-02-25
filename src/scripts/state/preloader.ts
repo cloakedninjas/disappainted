@@ -19,6 +19,7 @@ module Alak.State {
             this.load.image('title-target-painting', 'assets/images/target_painting.png');
             this.load.image('title-your-painting', 'assets/images/your_painting.png');
             this.load.image('btn-continue', 'assets/images/continue.png');
+            this.load.image('title-total', 'assets/images/total_score.png');
 
             for (let i = 1; i <= Entity.Subject.FACE_PERMS; i++) {
                 Entity.Subject.FACE_PIECES.forEach(function (piece) {

@@ -37,7 +37,7 @@ module Alak.State {
             let title2 = new Phaser.Image(this.game, 410, 20, 'title-your-painting');
             this.group2.add(title2);
 
-            this.continueButton = new Phaser.Button(this.game, 575, 540, 'btn-continue', this.showScores, this);
+            this.continueButton = new Phaser.Button(this.game, 575, 540, 'btn-continue', this.hideSubject, this);
             this.continueButton.visible = false;
             this.add.existing(this.continueButton);
 
@@ -90,8 +90,58 @@ module Alak.State {
             group.add(easel);
         }
 
-        showScores() {
+        hideSubject() {
+            let xPos = -390;
+            let duration = 800;
+            let easing = Phaser.Easing.Circular.InOut;
 
+            this.game.add.tween(this.continueButton).to({
+                y: 600
+            }, duration, easing, true);
+
+            this.game.add.tween(this.group1).to({
+                x: xPos
+            }, duration, easing, true);
+
+            let tween = this.game.add.tween(this.group2).to({
+                x: xPos
+            }, duration, easing, true);
+            
+            tween.onComplete.add(this.showScore, this)
+        }
+
+        showScore() {
+            this.add.image(0, 0, 'title-total');
+
+            let tot = ((this.scores.leftBlank + this.scores.painted) / 200) * 100;
+
+            let totalScore = new Phaser.Text(this.game, 610, 100, tot + '%', {
+                'font': '100px Arial',
+                'fontWeight': 'bold',
+                'fill': '#fffaee',
+                'align': 'center'
+            });
+
+            totalScore.anchor.x = 0.5;
+            this.add.existing(totalScore);
+
+            let paintedScore = new Phaser.Text(this.game, 690, 220, this.scores.painted + '%', {
+                'font': '34px Arial',
+                'fill': '#fffaee',
+                'align': 'center'
+            });
+
+            paintedScore.anchor.x = 0.5;
+            this.add.existing(paintedScore);
+
+            let leftBlankScore = new Phaser.Text(this.game, 690, 287, this.scores.leftBlank + '%', {
+                'font': '34px Arial',
+                'fill': '#fffaee',
+                'align': 'center'
+            });
+
+            leftBlankScore.anchor.x = 0.5;
+            this.add.existing(leftBlankScore);
         }
     }
 }
