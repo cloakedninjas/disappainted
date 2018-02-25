@@ -6,6 +6,7 @@ module Alak.Entity {
             '#8c5214', '#eaac78', '#ffd4ae', '#fff',
             '#19a541', '#9abd3b', '#e53c70', '#ffb0c5'
         ];
+        static HIDE_DISTANCE: number = 40;
 
         game: Game;
         localBounds: PIXI.Rectangle;
@@ -73,7 +74,7 @@ module Alak.Entity {
         hide(delay: number = 0) {
             this.animating = true;
             let tween = this.game.add.tween(this.position).to({
-                y: this.startingY + 45
+                y: this.startingY + Palette.HIDE_DISTANCE
             }, 800, Phaser.Easing.Circular.InOut, true, delay);
 
             tween.onComplete.add(function () {
@@ -86,7 +87,7 @@ module Alak.Entity {
             this.animating = true;
             let tween = this.game.add.tween(this.position).to({
                 y: this.startingY
-            }, 400, Phaser.Easing.Circular.Out, true);
+            }, 400, Phaser.Easing.Linear.None, true);
 
             tween.onComplete.add(function () {
                 this.beingHidden = false;
