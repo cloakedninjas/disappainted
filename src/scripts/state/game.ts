@@ -151,9 +151,10 @@ module Alak.State {
         }
 
         calcScore() {
+            let score = 0;
             let score2 = 0;
-            let score3 = 0;
-            let total = 0;
+            let total1 = 0;
+            let total2 = 0;
 
             // update BMDs
             this.finalBitmap.update();
@@ -169,22 +170,29 @@ module Alak.State {
             let userChunkData = this.calcChunkData(this.finalBitmap.getPixels(this.judgingRect));
 
             for (let i = 0, len = userChunkData.length; i < len; i++) {
-                total++;
-                if (subjectChunkData[i] !== 0 && userChunkData[i] === subjectChunkData[i]) {
-                    score2++;
+                if (subjectChunkData[i] !== 0) {
+                    total1++;
+
+                    if (userChunkData[i] === subjectChunkData[i]) {
+                        score++;
+                    }
                 }
 
-                if (subjectChunkData[i] === 0 && userChunkData[i] === 0) {
-                    score3++;
+                if (subjectChunkData[i] === 0) {
+                    total2++;
+
+                    if (userChunkData[i] === 0) {
+                        score2++;
+                    }
                 }
             }
 
-            //console.log(score2, (score2 / total) * 100);
-            //console.log(score3, (score3 / total) * 100);
+            //console.log(score, (score / total1) * 100);
+            //console.log(score2, (score2 / total1) * 100);
 
             return {
-                leftBlank: Math.round((score3 / total) * 100),
-                painted: Math.round((score2 / total) * 100)
+                leftBlank: Math.round((score2 / total2) * 100),
+                painted: Math.round((score / total1) * 100)
             }
         }
 

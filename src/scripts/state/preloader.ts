@@ -5,6 +5,10 @@ module Alak.State {
         preload() {
             this.loadingBar = new Entity.PreloadBar(this.game);
 
+            this.load.image('main-menu', 'assets/images/main_menu.png');
+
+            this.load.spritesheet('btn-play', 'assets/images/play.png', 240, 243);
+
             this.load.image('background', 'assets/images/background.png');
             this.load.image('palette', 'assets/images/palette.png');
             this.load.image('paintpot', 'assets/images/paintpot.png');
@@ -19,6 +23,7 @@ module Alak.State {
             this.load.image('title-target-painting', 'assets/images/target_painting.png');
             this.load.image('title-your-painting', 'assets/images/your_painting.png');
             this.load.image('btn-continue', 'assets/images/continue.png');
+            this.load.image('btn-play-again', 'assets/images/play_again.png');
             this.load.image('title-total', 'assets/images/total_score.png');
 
             for (let i = 1; i <= Entity.Subject.FACE_PERMS; i++) {
@@ -46,7 +51,7 @@ module Alak.State {
         }
 
         startGame() {
-            this.game.state.start('game', true);
+            this.game.state.start('main-menu', true);
             //this.game.state.start('end', true);
         }
 

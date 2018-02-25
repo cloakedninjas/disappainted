@@ -8,6 +8,7 @@ module Alak.State {
         canvasImage: Phaser.BitmapData;
 
         continueButton: Phaser.Button;
+        playAgainButton: Phaser.Button;
 
         init(opts) {
             this.scores = opts.scores;
@@ -142,6 +143,12 @@ module Alak.State {
 
             leftBlankScore.anchor.x = 0.5;
             this.add.existing(leftBlankScore);
+
+            this.playAgainButton = new Phaser.Button(this.game, 465, 370, 'btn-play-again', function () {
+                this.game.state.start('game');
+            }, this);
+
+            this.add.existing(this.playAgainButton);
         }
     }
 }
