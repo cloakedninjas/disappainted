@@ -10,6 +10,7 @@ module Alak.Entity {
         game: Game;
         localBounds: PIXI.Rectangle;
         highlight: Phaser.Image;
+        sound: Phaser.Sound;
         potIndex: number;
         currentColour: string;
         startingY: number;
@@ -34,9 +35,12 @@ module Alak.Entity {
             this.paintPot = new PaintPot(game, 40, 50);
             this.addChild(this.paintPot);
 
+            this.sound = new Phaser.Sound(game, 'brushdip');
+
             this.currentColour = Palette.COLOURS[0];
 
             this.events.onInputDown.add(function () {
+                this.sound.play();
                 this.currentColour = Palette.COLOURS[this.potIndex];
             }, this);
 

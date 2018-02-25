@@ -44,6 +44,7 @@ module Alak.State {
             this.load.audio('btn-click', 'assets/sfx/btn-click.mp3');
             this.load.audio('play', 'assets/sfx/play.mp3');
             this.load.audio('brushdrop', 'assets/sfx/brushdrop.mp3');
+            this.load.audio('brushdip', 'assets/sfx/brushdip.mp3');
             this.load.audio('paint-start', 'assets/sfx/painting_impact.mp3');
             //this.load.audio('paint-continuous', 'assets/sfx/painting_continuous.mp3');
         }
