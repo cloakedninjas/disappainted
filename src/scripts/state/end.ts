@@ -155,8 +155,18 @@ module Alak.State {
             }, this);
 
             this.playAgainButton.onDownSound = new Phaser.Sound(this.game, 'btn-click');
-
             this.add.existing(this.playAgainButton);
+
+            let youTried = new Phaser.Sprite(this.game, 365, 405, 'you-tried');
+            youTried.scale.set(0, 0);
+            youTried.anchor.set(0.5, 0.5);
+
+            this.add.existing(youTried);
+
+            this.game.add.tween(youTried.scale).to({
+                x: 1,
+                y: 1
+            }, 800, Phaser.Easing.Bounce.Out, true, 1000);
         }
 
         shutdown() {
