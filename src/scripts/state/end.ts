@@ -10,6 +10,8 @@ module Alak.State {
         continueButton: Phaser.Button;
         playAgainButton: Phaser.Button;
 
+        music: Phaser.Sound;
+
         init(opts) {
             this.scores = opts.scores;
             this.subjectImage = opts.subject;
@@ -54,6 +56,9 @@ module Alak.State {
             tween.onComplete.add(function () {
                this.continueButton.visible = true;
             }, this);
+
+            this.music = new Phaser.Sound(this.game, 'music-scores', 1, true);
+            this.music.play();
         }
 
         makeCanvas(bmd: Phaser.BitmapData, group: Phaser.Group, groupNum: number) {
@@ -115,7 +120,7 @@ module Alak.State {
         showScore() {
             this.add.image(0, 0, 'title-total');
 
-            let tot = ((this.scores.leftBlank + this.scores.painted) / 200) * 100;
+            let tot = Math.round(((this.scores.leftBlank + this.scores.painted) / 200) * 100);
 
             let totalScore = new Phaser.Text(this.game, 610, 100, tot + '%', {
                 'font': '100px Arial',
@@ -152,6 +157,10 @@ module Alak.State {
             this.playAgainButton.onDownSound = new Phaser.Sound(this.game, 'btn-click');
 
             this.add.existing(this.playAgainButton);
+        }
+
+        shutdown() {
+            this.music.stop();
         }
     }
 }

@@ -31,8 +31,9 @@ module Alak.State {
         debugEnabled: boolean = false;
 
         sounds: {
-            paintStart: Phaser.Sound
+            paintStart: Phaser.Sound,
             //paintContinuous: Phaser.Sound
+            music: Phaser.Sound
         };
 
         create() {
@@ -104,6 +105,7 @@ module Alak.State {
             this.sounds = {
                 paintStart: new Phaser.Sound(this.game, 'paint-start'),
                 //paintContinuous: new Phaser.Sound(this.game, 'paint-continuous', 1, true)
+                music: new Phaser.Sound(this.game, 'music-game', 1, true)
             };
 
             let timer = this.game.time.create();
@@ -113,6 +115,13 @@ module Alak.State {
             }, this);
 
             timer.start();
+
+            let musicDelay = this.game.time.create();
+            musicDelay.add(4000, function () {
+                this.sounds.music.play();
+            }, this);
+
+            musicDelay.start();
         }
 
         update() {
@@ -323,6 +332,8 @@ module Alak.State {
 
             let scores = this.calcScore();
 
+            this.sounds.music.fadeOut(1500);
+
             this.game.add.tween(this.palette).to({
                 y: this.palette.y + 200
             }, duration, easing, true);
@@ -371,6 +382,10 @@ module Alak.State {
             return input.sort((a, b) =>
                 input.filter(v => v === a).length - input.filter(v => v === b).length
             ).pop();
+        }
+
+        shutdown() {
+            this.sounds.music.stop();
         }
     }
 }
