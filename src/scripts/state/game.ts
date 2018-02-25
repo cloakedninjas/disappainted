@@ -24,7 +24,6 @@ module Alak.State {
         subjectY: number = 76;
         brushSize: number = 5;
 
-        lookingAtSubject: boolean = true;
         palette: Entity.Palette;
         prevMousePos: Phaser.Point;
         debug: Phaser.Text;
@@ -52,13 +51,13 @@ module Alak.State {
             this.add.existing(this.palette);
 
             /*this.paintPots.forEach(function (paintpot: Entity.PaintPot) {
-                this.add.existing(paintpot);
-                paintpot.events.onInputDown.add(this.handleColourChange, this);
-            }, this);*/
+             this.add.existing(paintpot);
+             paintpot.events.onInputDown.add(this.handleColourChange, this);
+             }, this);*/
 
 
             if (this.debugEnabled) {
-                this.debug = new Phaser.Text(this.game, 400, this.game.height - 20, 'Hello', {
+                this.debug = new Phaser.Text(this.game, 10, 10, 'Hello', {
                     font: '12px Arial'
                 });
 
@@ -118,71 +117,88 @@ module Alak.State {
 
             //this.visibleBitmap.fill(237, 232, 218, 0.05);
 
-            /*if (this.debugEnabled) {
+            if (this.debugEnabled) {
                 let paintX = game.input.x - this.easelX;
                 let paintY = game.input.y - this.easelY;
 
                 if (paintX >= 0 && paintY >= 0 && paintX <= this.easelWidth && paintY <= this.easelHeight) {
                     let subjectCol = this.subjectComposite.getPixel(paintX, paintY);
-                    let easelCol = this.visibleBitmap.getPixel(paintX, paintY);
+                    let easelCol = this.finalBitmap.getPixel(paintX, paintY);
 
-                    subjectCol = subjectCol.r + ',' + subjectCol.g + ',' + subjectCol.b;
-                    easelCol = easelCol.r + ',' + easelCol.g + ',' + easelCol.b;
+                    subjectCol = this.rgb2Hex(subjectCol.r, subjectCol.g, subjectCol.b);
+                    easelCol = this.rgb2Hex(easelCol.r, easelCol.g, easelCol.b);
 
                     this.debug.text = paintX + ', ' + paintY + ' | Subject: ' + subjectCol + '| Easel: ' + easelCol;
+
+
                 }
-            }*/
+
+                /*let ctx = this.game.canvas.getContext('2d');
+                 ctx.save();
+
+                 ctx.strokeStyle = 'red';
+                 ctx.strokeRect(0, 0, 100, 100);
+
+                 ctx.fillStyle = 'rgb(' + subjectCol + ')';
+                 ctx.fillRect(100, 20, 10, 10);
+
+                 ctx.fillStyle = 'rgb(' + easelCol + ')';
+                 ctx.fillRect(150, 20, 10, 10);
+
+                 ctx.restore();*/
+            }
         }
 
         /*lookAtSubject() {
-            this.lookingAtSubject = !this.lookingAtSubject;
-            this.moveCanvas(this.lookingAtSubject);
-        }*/
+         this.lookingAtSubject = !this.lookingAtSubject;
+         this.moveCanvas(this.lookingAtSubject);
+         }*/
 
         /*moveCanvas(towards: boolean) {
-            let duration = 800;
-            let easing = Phaser.Easing.Quintic.InOut;
-            let easelMoveAmount = 315;
-            let subjectMoveAmount = 80;
+         let duration = 800;
+         let easing = Phaser.Easing.Quintic.InOut;
+         let easelMoveAmount = 315;
+         let subjectMoveAmount = 80;
 
-            if (towards) {
-                this.game.add.tween(this.easelImage.position).to({
-                    x: this.easelImage.x - easelMoveAmount
-                }, duration, easing, true);
+         if (towards) {
+         this.game.add.tween(this.easelImage.position).to({
+         x: this.easelImage.x - easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.easelCanvas.position).to({
-                    x: this.easelCanvas.x - easelMoveAmount
-                }, duration, easing, true);
+         this.game.add.tween(this.easelCanvas.position).to({
+         x: this.easelCanvas.x - easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.easelWood.position).to({
-                    x: this.easelWood.x - easelMoveAmount
-                }, duration, easing, true);
+         this.game.add.tween(this.easelWood.position).to({
+         x: this.easelWood.x - easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.subjectCompositeImage.position).to({
-                    x: this.subjectCompositeImage.x - subjectMoveAmount
-                }, duration, easing, true);
-            } else {
-                this.game.add.tween(this.easelImage.position).to({
-                    x: this.easelImage.x + easelMoveAmount
-                }, duration, easing, true);
+         this.game.add.tween(this.subjectCompositeImage.position).to({
+         x: this.subjectCompositeImage.x - subjectMoveAmount
+         }, duration, easing, true);
+         } else {
+         this.game.add.tween(this.easelImage.position).to({
+         x: this.easelImage.x + easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.easelCanvas.position).to({
-                    x: this.easelCanvas.x + easelMoveAmount
-                }, duration, easing, true);
+         this.game.add.tween(this.easelCanvas.position).to({
+         x: this.easelCanvas.x + easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.easelWood.position).to({
-                    x: this.easelWood.x + easelMoveAmount
-                }, duration, easing, true);
+         this.game.add.tween(this.easelWood.position).to({
+         x: this.easelWood.x + easelMoveAmount
+         }, duration, easing, true);
 
-                this.game.add.tween(this.subjectCompositeImage.position).to({
-                    x: this.subjectCompositeImage.x + subjectMoveAmount
-                }, duration, easing, true);
-            }
-        }*/
+         this.game.add.tween(this.subjectCompositeImage.position).to({
+         x: this.subjectCompositeImage.x + subjectMoveAmount
+         }, duration, easing, true);
+         }
+         }*/
 
         calcScore() {
             let score = 0;
             let total = 0;
+            let score2 = 0;
 
             // update BMDs
             this.finalBitmap.update();
@@ -200,15 +216,49 @@ module Alak.State {
 
             for (let i = 0, len = userChunkData.length; i < len; i++) {
                 total++;
-                if (subjectChunkData[i] !== 0 && userChunkData[i] === subjectChunkData[i]) {
+                if (userChunkData[i] === subjectChunkData[i]) {
                     score++;
+                }
+
+                if (subjectChunkData[i] !== 0 && userChunkData[i] === subjectChunkData[i]) {
+                    score2++;
                 }
             }
 
             console.log(score, (score / total) * 100);
+            console.log(score2, (score2 / total) * 100);
         }
 
         calcChunkData(sourceData: ImageData): number[] {
+            let chunkColours = [];
+            let chunkSize = 10;
+            let compWidth = sourceData.width * 4;
+            let chunkWidth = sourceData.width / chunkSize;
+
+            for (let i = 0; i < sourceData.data.length; i += 4) {
+                let x = (i % compWidth) / 4;
+                let y = Math.floor(i / compWidth);
+
+                let chunkIndex = (Math.floor(y / chunkSize) * chunkWidth) + Math.floor(x / chunkSize);
+
+                if (!chunkColours[chunkIndex]) {
+                    chunkColours[chunkIndex] = [];
+                }
+
+                let colour = this.rgb2Dec(sourceData.data[i], sourceData.data[i + 1], sourceData.data[i + 2]);
+                chunkColours[chunkIndex].push(colour);
+            }
+
+            // reduce each chunk array to a single value
+
+            chunkColours.forEach(function (chunk, i) {
+                chunkColours[i] = this.getMode(chunk);
+            }, this);
+
+            return chunkColours;
+        }
+
+        /*calcChunkData(sourceData: ImageData): number[] {
             let chunkSize = 10;
             let chunks = [];
             let k = 0;
@@ -219,18 +269,33 @@ module Alak.State {
 
             for (let y = 0; y < chunkHeight; y++) {
                 for (let x = 0; x < chunkWidth; x++) {
-                    let r = (y * pxChunkSize * chunkWidth) + (x * pxChunkSize);
 
-                    chunks[k] = data[r] << 16;
-                    chunks[k] = chunks[k] + (data[r + 1] << 8);
-                    chunks[k] = chunks[k] + data[r + 2];
+                    // find the mode
 
+                    let chunkColours = [];
+
+                    for (let i = 0; i < chunkSize; i++) {
+                        for (let j = 0; j < chunkSize; j++) {
+
+                            let r = (y * pxChunkSize * chunkWidth) + (x * pxChunkSize);
+
+                            let colour = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
+
+                            chunkColours.push(data[r])
+
+                            //chunkColourTotals
+                        }
+                    }
+
+                    chunks[k] = this.getMode(chunkColours);
+
+                    //chunks[k] = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
                     k++;
                 }
             }
 
             return chunks;
-        }
+        }*/
 
         createSubject() {
             let bodyPerm = Math.floor(Phaser.Math.random(1, Entity.Subject.BODY_PERMS + 1));
@@ -257,6 +322,23 @@ module Alak.State {
             this.subjectCompositeImage = this.subjectComposite.addToWorld(this.subjectX, this.subjectY);
             this.subjectCompositeImage.scale.x = 0.75;
             this.subjectCompositeImage.scale.y = 0.75;
+        }
+
+        rgb2Hex(r, g, b) {
+            return r.toString(16) + g.toString(16) + b.toString(16);
+        }
+
+        rgb2Dec(r, g, b) {
+            return (r << 16) + (g << 8) + b;
+        }
+
+        /**
+         * https://stackoverflow.com/a/20762713/423734
+         */
+        getMode(input: number[]) {
+            return input.sort((a, b) =>
+                input.filter(v => v === a).length - input.filter(v => v === b).length
+            ).pop();
         }
     }
 }
