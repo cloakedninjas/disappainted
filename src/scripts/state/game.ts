@@ -24,6 +24,7 @@ module Alak.State {
         subjectY: number = 76;
         brushSize: number = 5;
 
+        paintBrush: Phaser.Sprite;
         palette: Entity.Palette;
         prevMousePos: Phaser.Point;
         debug: Phaser.Text;
@@ -68,20 +69,20 @@ module Alak.State {
 
             this.game.canvas.classList.add('hide-cursor');
 
-            let cursor = this.add.sprite(this.game.input.mousePointer.x, this.game.input.mousePointer.y, 'brush-cursor');
-            cursor.anchor.set(0.13, 1);
+            this.paintBrush = this.add.sprite(this.game.input.mousePointer.x, this.game.input.mousePointer.y, 'brush-cursor');
+            this.paintBrush.anchor.set(0.13, 1);
 
             this.game.input.addMoveCallback(function () {
-                cursor.x = Math.round(this.game.input.mousePointer.x);
-                cursor.y = Math.round(this.game.input.mousePointer.y);
+                this.paintBrush.x = Math.round(this.game.input.mousePointer.x);
+                this.paintBrush.y = Math.round(this.game.input.mousePointer.y);
             }, this);
 
             this.game.input.onDown.add(function () {
-                cursor.loadTexture('brush-cursor-down');
+                this.paintBrush.loadTexture('brush-cursor-down');
             }, this);
 
             this.game.input.onUp.add(function () {
-                cursor.loadTexture('brush-cursor');
+                this.paintBrush.loadTexture('brush-cursor');
             }, this);
 
             let timer = this.game.time.create();
@@ -149,63 +150,16 @@ module Alak.State {
             }
         }
 
-        /*lookAtSubject() {
-         this.lookingAtSubject = !this.lookingAtSubject;
-         this.moveCanvas(this.lookingAtSubject);
-         }*/
-
-        /*moveCanvas(towards: boolean) {
-         let duration = 800;
-         let easing = Phaser.Easing.Quintic.InOut;
-         let easelMoveAmount = 315;
-         let subjectMoveAmount = 80;
-
-         if (towards) {
-         this.game.add.tween(this.easelImage.position).to({
-         x: this.easelImage.x - easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.easelCanvas.position).to({
-         x: this.easelCanvas.x - easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.easelWood.position).to({
-         x: this.easelWood.x - easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.subjectCompositeImage.position).to({
-         x: this.subjectCompositeImage.x - subjectMoveAmount
-         }, duration, easing, true);
-         } else {
-         this.game.add.tween(this.easelImage.position).to({
-         x: this.easelImage.x + easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.easelCanvas.position).to({
-         x: this.easelCanvas.x + easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.easelWood.position).to({
-         x: this.easelWood.x + easelMoveAmount
-         }, duration, easing, true);
-
-         this.game.add.tween(this.subjectCompositeImage.position).to({
-         x: this.subjectCompositeImage.x + subjectMoveAmount
-         }, duration, easing, true);
-         }
-         }*/
-
         calcScore() {
-            let score = 0;
-            let total = 0;
             let score2 = 0;
+            let score3 = 0;
+            let total = 0;
 
             // update BMDs
             this.finalBitmap.update();
             this.subjectComposite.update();
 
             this.easelImage.visible = false;
-            this.finalBitmap.addToWorld(this.easelX, this.easelY);
 
             // define judging area
             this.judgingRect = new Phaser.Rectangle(30, 10, 290, 480);
@@ -216,17 +170,22 @@ module Alak.State {
 
             for (let i = 0, len = userChunkData.length; i < len; i++) {
                 total++;
-                if (userChunkData[i] === subjectChunkData[i]) {
-                    score++;
-                }
-
                 if (subjectChunkData[i] !== 0 && userChunkData[i] === subjectChunkData[i]) {
                     score2++;
                 }
+
+                if (subjectChunkData[i] === 0 && userChunkData[i] === 0) {
+                    score3++;
+                }
             }
 
-            console.log(score, (score / total) * 100);
-            console.log(score2, (score2 / total) * 100);
+            //console.log(score2, (score2 / total) * 100);
+            //console.log(score3, (score3 / total) * 100);
+
+            return {
+                leftBlank: Math.round((score3 / total) * 100),
+                painted: Math.round((score2 / total) * 100)
+            }
         }
 
         calcChunkData(sourceData: ImageData): number[] {
@@ -259,43 +218,43 @@ module Alak.State {
         }
 
         /*calcChunkData(sourceData: ImageData): number[] {
-            let chunkSize = 10;
-            let chunks = [];
-            let k = 0;
-            let data = sourceData.data;
-            let chunkWidth = this.easelWidth / chunkSize;
-            let chunkHeight = this.easelHeight / chunkSize;
-            let pxChunkSize = chunkSize * 4;
+         let chunkSize = 10;
+         let chunks = [];
+         let k = 0;
+         let data = sourceData.data;
+         let chunkWidth = this.easelWidth / chunkSize;
+         let chunkHeight = this.easelHeight / chunkSize;
+         let pxChunkSize = chunkSize * 4;
 
-            for (let y = 0; y < chunkHeight; y++) {
-                for (let x = 0; x < chunkWidth; x++) {
+         for (let y = 0; y < chunkHeight; y++) {
+         for (let x = 0; x < chunkWidth; x++) {
 
-                    // find the mode
+         // find the mode
 
-                    let chunkColours = [];
+         let chunkColours = [];
 
-                    for (let i = 0; i < chunkSize; i++) {
-                        for (let j = 0; j < chunkSize; j++) {
+         for (let i = 0; i < chunkSize; i++) {
+         for (let j = 0; j < chunkSize; j++) {
 
-                            let r = (y * pxChunkSize * chunkWidth) + (x * pxChunkSize);
+         let r = (y * pxChunkSize * chunkWidth) + (x * pxChunkSize);
 
-                            let colour = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
+         let colour = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
 
-                            chunkColours.push(data[r])
+         chunkColours.push(data[r])
 
-                            //chunkColourTotals
-                        }
-                    }
+         //chunkColourTotals
+         }
+         }
 
-                    chunks[k] = this.getMode(chunkColours);
+         chunks[k] = this.getMode(chunkColours);
 
-                    //chunks[k] = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
-                    k++;
-                }
-            }
+         //chunks[k] = this.rgb2Dec(data[r], data[r + 1], data[r + 2]);
+         k++;
+         }
+         }
 
-            return chunks;
-        }*/
+         return chunks;
+         }*/
 
         createSubject() {
             let bodyPerm = Math.floor(Phaser.Math.random(1, Entity.Subject.BODY_PERMS + 1));
@@ -322,6 +281,50 @@ module Alak.State {
             this.subjectCompositeImage = this.subjectComposite.addToWorld(this.subjectX, this.subjectY);
             this.subjectCompositeImage.scale.x = 0.75;
             this.subjectCompositeImage.scale.y = 0.75;
+        }
+
+        hideBrush() {
+            this.paintBrush.visible = false;
+        }
+
+        endGame() {
+            // move objects
+            let duration = 1500;
+            let easing = Phaser.Easing.Circular.InOut;
+
+            let scores = this.calcScore();
+
+            this.game.add.tween(this.palette).to({
+                y: this.palette.y + 200
+            }, duration, easing, true);
+
+            // subject
+            this.game.add.tween(this.subjectCompositeImage).to({
+                x: -(this.subjectCompositeImage.x + this.subjectCompositeImage.width)
+            }, duration, easing, true);
+
+            this.game.add.tween(this.subjectLower).to({
+                x: -(this.subjectLower.x + this.subjectLower.width)
+            }, duration, easing, true);
+
+            // easel
+            this.easelImage.visible = false;
+
+            this.game.add.tween(this.easelWood).to({
+                x: this.game.width
+            }, duration, easing, true);
+
+            let tween = this.game.add.tween(this.easelCanvas).to({
+                x: this.game.width
+            }, duration, easing, true);
+
+            tween.onComplete.add(function () {
+                this.game.state.start('end', true, false, {
+                    scores: scores,
+                    subject: this.subjectComposite,
+                    canvas: this.finalBitmap
+                });
+            }, this);
         }
 
         rgb2Hex(r, g, b) {

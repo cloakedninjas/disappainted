@@ -7,12 +7,18 @@ module Alak.State {
 
             this.load.image('background', 'assets/images/background.png');
             this.load.image('palette', 'assets/images/palette.png');
+            this.load.image('paintpot', 'assets/images/paintpot.png');
+            this.load.image('paintpot-done', 'assets/images/paintpot-done.png');
             this.load.image('easel-wood', 'assets/images/easel-wood.png');
             this.load.image('easel-canvas', 'assets/images/easel-canvas.png');
             this.load.image('brush-cursor', 'assets/images/cursor.png');
             this.load.image('brush-cursor-down', 'assets/images/cursor-down.png');
             this.load.image('selected-paint', 'assets/images/selected_paint.png');
             this.load.image('subject-face', 'assets/images/subject/face.png');
+
+            this.load.image('title-target-painting', 'assets/images/target_painting.png');
+            this.load.image('title-your-painting', 'assets/images/your_painting.png');
+            this.load.image('btn-continue', 'assets/images/continue.png');
 
             for (let i = 1; i <= Entity.Subject.FACE_PERMS; i++) {
                 Entity.Subject.FACE_PIECES.forEach(function (piece) {
@@ -27,6 +33,9 @@ module Alak.State {
                     this.load.image('subject-' + piece + '-' + i, path);
                 }, this);
             }
+
+            // audio
+            this.load.audio('brushdrop', 'assets/sfx/brushdrop.mp3');
         }
 
         create() {
@@ -37,6 +46,7 @@ module Alak.State {
 
         startGame() {
             this.game.state.start('game', true);
+            //this.game.state.start('end', true);
         }
 
         loadUpdate() {

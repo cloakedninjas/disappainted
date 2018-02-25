@@ -16,6 +16,8 @@ module Alak.Entity {
         beingHidden: boolean = false;
         animating: boolean = false;
 
+        paintPot: PaintPot;
+
         constructor(game, x, y) {
             super(game, x, y, 'palette');
             this.startingY = y;
@@ -24,10 +26,13 @@ module Alak.Entity {
             this.localBounds.x = Palette.X_OFFSET;
             this.localBounds.y = y;
             this.localBounds.width = 590;
+
             this.highlight = new Phaser.Image(game, 0, 5, 'selected-paint');
             this.highlight.visible = false;
-
             this.addChild(this.highlight);
+
+            this.paintPot = new PaintPot(game, 40, 50);
+            this.addChild(this.paintPot);
 
             this.currentColour = Palette.COLOURS[0];
 
@@ -39,6 +44,10 @@ module Alak.Entity {
         }
 
         update() {
+            if (!this.inputEnabled) {
+                return false;
+            }
+
             if (this.localBounds.contains(this.game.input.x, this.game.input.y)) {
                 if (this.beingHidden && !this.animating) {
                     this.show();
@@ -73,7 +82,7 @@ module Alak.Entity {
             this.animating = true;
             let tween = this.game.add.tween(this.position).to({
                 y: this.startingY
-            }, 400, Phaser.Easing.Circular.InOut, true);
+            }, 400, Phaser.Easing.Circular.Out, true);
 
             tween.onComplete.add(function () {
                 this.beingHidden = false;

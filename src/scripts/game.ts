@@ -8,6 +8,7 @@ module Alak {
 
             this.state.add('preloader', State.Preloader, true);
             this.state.add('game', State.Game);
+            this.state.add('end', State.End);
         }
     }
 }
